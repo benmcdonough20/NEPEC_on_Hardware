@@ -136,12 +136,12 @@ def generate_circuits(P, gate, folds):
     return circuits
 
 #measure expectation values on a list of ciruits, corresponding to different depths
-def fidelity_experiment(circuits, backend, basis_gates, noise_model, shots):
+def fidelity_experiment(circuits, backend, noise_model, shots):
     fidelities = []
     for [pos_circ, neg_circ] in circuits:
         fidelities.append(measure_fidelity(pos_circ, 
                                            neg_circ, backend, 
-                                           basis_gates, noise_model, shots))
+                                           noise_model.basis_gates, noise_model, shots))
 
     return fidelities.copy()
 

@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from itertools import product
+from typing import List
 
 '''
 This class translates an adjacency list of random labels into an adjacency matrix,
@@ -91,7 +92,7 @@ class connectivity_map:
     #get all qubits that are separated by depth steps from the current qubit
     def connections_at_depth(self, qubit : int, depth : int) -> List[int]:
         #get the chains originating at qubit and return tail of each
-        return [connection[-1] for connection in self.get_chains(qubit, depth)]
+        return [connection[-1] for connection in self.get_chains_with(qubit, depth)]
 
     #get all pairs of qubits that are separated by depth steps
     def all_connections_at_depth(self, depth : int) -> List[tuple]:

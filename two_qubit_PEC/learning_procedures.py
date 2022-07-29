@@ -240,6 +240,7 @@ class SingleGateLayerExperiment:
 
         transpiled_gates['I'].id(0)
         transpiled_gates['Z'].id(0)
+        transpiled_gates['XX'].id(0)
 
         return raw_gates, transpiled_gates
 

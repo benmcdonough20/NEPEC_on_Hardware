@@ -20,6 +20,7 @@ As of writing this, Mitiq dependencies are in conflict with PyGSTi and PyQuil de
 * Proposal of parameter scaling technique for applying PER to sparse Pauli model
 * Implementation of sparse Pauli model learning procedure for arbitrary circuit layers consisting of single-qubit gates and self-adjoint two-qubit Clifford gates
 * Package for easily importing this procedure as part of a Qiskit or PyQuil workflow
+* Routine for parsing an arbitrary circuit to generate benchmark procedure
 
 ## Features that are not currently implemented
 * Complete testing suite
@@ -53,6 +54,11 @@ This notebook combines all of the parts of the learning procedure into a program
 * `TomographyProcedure` - This notebook gives a step-by-step walkthrough of how the sparse noise model learning procedure is implemented for an arbitrary circuit layer.
 * `QiskitImplementation` - This packages the procedure outlined in the previous notebook into a set of classes which can easily be imported and run to abstract the details of the learning procedure.
 * `PyQuilImplementation` - This package removes all of the Qiskit dependencies and implements the same procedure natively for Rigetti backends
+
+### ArbitraryCircuit
+
+* `CircuitDecomposition` - This notebook shows how an arbitrary `QuantumCircuit` object, complete with measurements, can be parsed to create a sequence of layers satisfying the requirements for benchmarking using the sparse Pauli tomography procedure
+* `ProcedureGeneration` - Here, the procedure generation for individual layers and the circuit parsing routine are put together to generate a full sparse Pauli tomography experiment for the layers in an arbitrary circuit. Once the analysis is integrated, this will make the benchmarking procedure fully autonomous.
 
 ## Credits
 Project Advisor: [Dr. Peter Orth](https://faculty.sites.iastate.edu/porth/)

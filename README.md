@@ -73,18 +73,25 @@ Collaborators:
 My thanks also go to Ewout van den Berg, Zlatko K. Minev, Abhinav Kandala, and Kristan Temme, whose work [Probabilistic error cancellation with sparse Pauli-Lindblad models on noisy quantum processors](https://arxiv.org/abs/2201.09866) heavily influenced this project, for graciously donating their time to answer my questions.
 
 ## References
+
 [1] Ewout van den Berg, Zlatko K Minev, Abhinav Kandala, and Kristan Temme. Probabilistic error cancel-
 lation with sparse pauli-lindblad models on noisy quantum processors. arXiv preprint arXiv:2201.09866,
 2022.
+
 [2] Andrea Mari, Nathan Shammah, and William J Zeng. Extending quantum probabilistic error cancella-
 tion by noise scaling. Physical Review A, 104(5):052607, 2021.
+
 [3] Ewout van den Berg, Zlatko K Minev, and Kristan Temme. Model-free readout-error mitigation for
 quantum expectation values. arXiv preprint arXiv:2012.09738, 2020.
+
 [4] R LaRose, A Mari, N Shammah, P Karalekas, and W Zeng. Mitiq: A software package for error
 mitigation on near-term quantum computers, 2020.
+
 [5] Steven T Flammia and Joel J Wallman. Efficient estimation of pauli channels. ACM Transactions on
 Quantum Computing, 1(1):1–32, 2020.
+
 [6] Michael A Nielsen and Isaac Chuang. Quantum computation and quantum information, 2002.
+
 [7] Erik Nielsen, Kenneth Rudinger, Timothy Proctor, Antonio Russo, Kevin Young, and Robin Blume-
 Kohout. Probing quantum processor performance with pygsti. Quantum science and technology,
 5(4):044002, 2020.

@@ -1,0 +1,42 @@
+from primitives.circuit import Circuit
+from primitives.term import Pauli
+
+from typing_extensions import Self
+from typing import Tuple
+
+class CircuitLayer:
+    """When benchmarking a circuit, it first needs to be separated into layers of the form
+    single qubit gates + disjoint self-adjoint two-qubit clifford gates. This class stores
+    layers of this form. The layer input must be passed in with this form"""
+
+    def __init__(self, layer : Circuit):
+        self.layer = layer
+        self.single_layer = self.separate_gates(1)
+        self.cliff_layer =  self.separate_gates(2) 
+
+    def separate_gates(self, weight : int) -> Circuit:
+        """This method parses the list of gates in the input layer and returns a Circuit
+        consisting only of gates with the desired weight"""
+
+        qc = self.layer.copy_empty() 
+        for inst in self.layer:
+            if inst.weight() == weight:
+                qc.add_instruction(inst)
+        return qc
+
+    def __eq__(self, other : Self):
+        """Two layers have the same noise profile if their clifford layers are equal. Thus,
+        two layers with the same clifford gates are considered to be equal"""
+
+        return frozenset([q for q in self.cliff_layer]) == frozenset([q for q in other.cliff_layer])
+
+    def __hash__(self):
+        """The hash function is chosed to reflect the new notion of layer equality. This may
+        be unneccessary as long as __eq__ is defined for set creation, but this remains to be
+        be investigated."""
+
+        return frozenset([q for q in self.cliff_layer]).__hash__()
+
+    def sample_PER(self, noise_model) -> Tuple[Circuit, int, Pauli]:
+        """sample a PER representation of the layer"""
+        pass

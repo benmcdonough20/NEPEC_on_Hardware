@@ -4,6 +4,10 @@ import contextvars
 imp = contextvars.ContextVar("implementation")
 
 class PERCircuit:
+    """Aggregation of circuit layers. Responsable for generating circuit layers and
+    representing them. The noise model is provided to this object to generate PER samples
+    circuits"""
+
     def __init__(self, qc):
         self.n = qc.num_qubits()
         self._qc = qc
@@ -28,10 +32,11 @@ class PERCircuit:
             layer_qubits = set()
             for inst in inst_list.copy():
                 if not layer_qubits.intersection(inst.support()):
-                    if inst.weight() == 2:
-                        layer_qubits = layer_qubits.union(inst.support())
                     circ.add_instruction(inst)
                     inst_list.remove(inst)
+
+                if inst.weight() == 2:
+                    layer_qubits = layer_qubits.union(inst.support())
             layers.append(CircuitLayer(circ))
 
         return layers

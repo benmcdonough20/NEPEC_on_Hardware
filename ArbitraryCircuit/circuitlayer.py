@@ -35,7 +35,7 @@ class CircuitLayer:
         be unneccessary as long as __eq__ is defined for set creation, but this remains to be
         be investigated."""
 
-        return frozenset([q for q in self.cliff_layer]).__hash__()
+        return hash(self.cliff_layer)
 
     def sample_PER(self, noise_model) -> Tuple[Circuit, int, Pauli]:
         """sample a PER representation of the layer"""

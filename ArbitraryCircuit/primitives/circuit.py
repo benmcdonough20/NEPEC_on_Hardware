@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
 from typing_extensions import Self
 
 
@@ -36,7 +36,8 @@ class Circuit(ABC):
 
         pass
 
-    def measure(self, qubits):
+    @abstractmethod
+    def measure_all(self, qubits):
         """Add a measure instruction to the desired qubits"""
 
     @abstractmethod
@@ -81,7 +82,16 @@ class Circuit(ABC):
     def original(self):
         """Returns the original circuit object in the native language"""
     
-    pass
+        pass
+
+    @property
+    @abstractmethod
+    def pauli_type(self):
+        """Returns the pauli implementation required to interact with the circuit"""
+        pass
+
+    def __hash__(self):
+        return frozenset([inst for inst in self]).__hash__()
 
 
 from qiskit import QuantumCircuit
@@ -103,9 +113,8 @@ class QiskitCircuit(Circuit):
     def barrier(self):
         self.qc.barrier()
 
-    def measure(self, qubits):
-        for i,q in enumerate(qubits):
-            self.qc.measure(q,i)
+    def measure_all(self):
+        self.qc.measure_all()
 
     def compose(self, other : Self):
         self.qc = self.qc.compose(other.qc)
@@ -130,3 +139,9 @@ class QiskitCircuit(Circuit):
 
     def original(self):
         return self.qc
+
+    def pauli_type(self):
+        return QiskitPauli
+
+    def __hash__(self):
+        return super().__hash__()

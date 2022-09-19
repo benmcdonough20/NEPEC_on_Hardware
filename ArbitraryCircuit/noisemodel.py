@@ -1,10 +1,9 @@
 import numpy as np
 from random import random
 from scipy.optimize import nnls
-from primitives.term import Term
 
 class NoiseModel:
-    def __init__(self, cliff_layer, model_terms = None):
+    def __init__(self, cliff_layer, model_terms):
         self.cliff_layer = cliff_layer
         self.model_terms = model_terms
         #self.overhead = np.exp(2*sum(noise_coefficients))
@@ -13,7 +12,7 @@ class NoiseModel:
         pass 
 
     def sample(self):
-        operator = Term("I"*self.n)
+        operator = self.cliff_layer.pauli_type("I"*self.n)
         sgn = 0
         noise_model = self.noise_model
         for term, prob in self.noise_model:

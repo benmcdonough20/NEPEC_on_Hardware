@@ -9,13 +9,19 @@ class TermData:
         self.term = term
         self.pair = pair
         self._expectations = {}
+        self._single_vals = []
+        self._single_count = 0
         self._count = {}
         self._spam = 1
         self._fidelity = 1
     
-    def add_expectation(self, depth, expectation):
-        self._expectations[depth] = expectation
-        self._count[depth] += self._counts.get(depth, 0)+1
+    def add_expectation(self, depth, expectation, type):
+        if type == "single":
+            self._single_vals.append(expectation)
+            self._single_count += 1
+        elif type == "double":
+            self._expectations[depth] = self._expectations.get(depth, 0) + expectation
+            self._count[depth] = self._count.get(depth, 0) + 1
 
     def _depths(self):
         return sorted(self._expectations.keys())
@@ -26,19 +32,6 @@ class TermData:
     def ispair(self):
         return self.term == self.pair
 
-class SingleData(TermData):
-
-    def set_SPAM(self, spam):
-        self.spam = spam
-
-    def fit(self):
-        expectation = abs(sum(self._expectations[1])/self._count[1])
-        self.fidelity = min([1,expectation/self.spam])
-
-        return self.fidelity
-
-class DoubleData(TermData):
-
     def fit(self):
         expfit = lambda x,a,b: a*np.exp(-b*x)
         try:
@@ -48,3 +41,10 @@ class DoubleData(TermData):
 
         self.spam = a
         self.fidelity = np.exp(-b)
+
+    def fit_single(self, meas_err):
+        if any(self._single_vals):
+            expectation = abs(sum(self._single_vals)/self._single_count)
+            self.fidelity = min([1,expectation/meas_err])
+
+    

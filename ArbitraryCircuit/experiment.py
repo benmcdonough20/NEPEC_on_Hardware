@@ -1,7 +1,10 @@
 from processorspec import ProcessorSpec
 from layerlearning import LayerLearning
+from analysis import Analysis
 from percircuit import PERCircuit
-from analysis import LayerAnalysis
+
+from primitives.circuit import QiskitCircuit
+from primitives.processor import QiskitProcessor
 
 class SparsePauliTomographyExperiment:
     """This class carries out the full experiment by creating and running a LayerLearning
@@ -9,31 +12,39 @@ class SparsePauliTomographyExperiment:
     with NoiseModels attached to each distinct layer"""
 
     def __init__(self, circuit, inst_map, backend):
-        self._circuit = PERCircuit(circuit)
-        self._layers = {}
-        self._procspec = ProcessorSpec(inst_map, backend)
-        self.instances = []
-        
-        for l in self._circuit.reps:
-            self._layers[l] = LayerLearning(l, inst_map, self._procspec)
 
-    def generate(self):
+        if circuit.__class__.__name__ == "QuantumCircuit":
+            circuit_interface = QiskitCircuit(circuit)
+            backend_interface = QiskitProcessor(backend)  
+        else:
+            raise Exception("Unsupported circuit type")
+
+        self._circuit = PERCircuit(circuit_interface)
+        self._procspec = ProcessorSpec(inst_map, backend_interface)
+        self.instances = []
+
+    def generate(self, samples, single_samples, depths):
+
         self.instances = []
         for l in self._circuit.reps:
-            self.instances += self._layers[l].procedure(self._procspec)
+            l = LayerLearning(l, samples, single_samples, depths)
+            self.instances += l.procedure(self._procspec)
+
+        self.analysis = Analysis(self.instances, self._procspec)
 
     def run(self, executor):
         for l in self._circuit.reps:
-            circuits = [inst.circuit().original() for inst in self.instances]
+            circuits = [inst._circuit.original() for inst in self.instances]
+
         results = executor(circuits)
-        for res,circ in zip(results, self.instances):
-            circ.result = res
+
+        for res,inst in zip(results, self.instances):
+            #TODO: feed into results object
+            inst.result = res
 
     def analyze(self):
-        analyses = []
-        for l in self._circuit.reps:
-            instances = [inst for inst in self.instances if inst.cliff_layer == l]
-            analyses.append(LayerAnalysis(l, instances, self._procspec))
+        """Runs analysis on each layer representative and stores for later plotting/viewing"""
+        self.analysis.analyze()
 
 
     def save(self):

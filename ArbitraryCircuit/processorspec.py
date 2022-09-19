@@ -5,11 +5,13 @@ from primitives.term import QiskitPauli
 pauli_type = QiskitPauli
 
 class ProcessorSpec:
+    """Responsible for interacting with the processor interface to generate the Pauli bases
+    and the model terms. Also stores the mapping of virtual to physical qubits for transpilation"""
 
     def __init__(self, inst_map, processor):
         self._n = len(inst_map)
         self._processor = processor
-        self._inst_map = inst_map
+        self.inst_map = inst_map
         self._connectivity = processor.sub_map(inst_map)
         self.meas_bases = self._meas_bases()
         self.model_terms = self._model_terms()

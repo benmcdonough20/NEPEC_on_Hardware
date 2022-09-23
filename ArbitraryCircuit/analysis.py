@@ -1,4 +1,6 @@
 from noisedata import NoiseData
+from matplotlib import pyplot as plt
+import pickle
 
 class Analysis:
     def __init__(self, benchmarkinstances, procspec):
@@ -29,3 +31,20 @@ class Analysis:
 
         for noisedata in self._data.values():
             noisedata.fit_noise_model()
+            
+    def profiles(self):
+        return list(self._data)
+
+    def plot(self, layer):
+        fig, ax = plt.subplots()
+        self._data[layer].plot(ax)
+        return ax
+
+    def save(self):
+        with open("results.dat", "wb") as f:
+            pickle.dump(self,f)
+
+    @staticmethod
+    def load():
+        with open("results.dat", "rb") as f:
+            return pickle.load(f)

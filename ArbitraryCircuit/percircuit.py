@@ -13,7 +13,6 @@ class PERCircuit:
         self._qc = qc
         self._layers = self._circuit_to_benchmark_layers()
         self._measurements = self._get_measurements()
-        self.reps = set(self._layers)
 
     def _get_measurements(self):
         qc = self._qc
@@ -46,3 +45,10 @@ class PERCircuit:
         PER representations of the circuit"""
 
         pass 
+
+    def display_circuit(self):
+        circ = self._qc.copy_empty()
+        for layer in self._layers:
+            circ.compose(layer.single_layer)
+            circ.compose(layer.cliff_layer)
+        return circ

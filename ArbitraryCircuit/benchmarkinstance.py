@@ -42,7 +42,7 @@ class BenchmarkInstance:
             self.rostring = "".join(choices(['I','X'], k=n))
             circ.add_pauli(pauli_frame)
 
-            circ.compose(self.meas_basis.z_basis(circ))
+            circ.compose(self.meas_basis.z_basis(circ).inverse())
             circ.add_pauli(pauli_type(self.rostring))
 
             circ.measure_all()

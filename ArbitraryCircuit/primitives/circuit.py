@@ -102,7 +102,7 @@ class QiskitCircuit(Circuit):
 
     def __init__(self, qc : QuantumCircuit):
         self.qc = qc
-    
+
     def add_instruction(self, inst : QiskitInstruction):
         self.qc.append(inst._instruction)
 

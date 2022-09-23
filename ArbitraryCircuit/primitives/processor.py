@@ -3,6 +3,7 @@ from primitives.result import Result
 from qiskit.providers.backend import BackendV2
 from qiskit import transpile
 from primitives.circuit import Circuit, QiskitCircuit
+from primitives.term import QiskitPauli
 
 class Processor(ABC):
     @abstractmethod
@@ -15,6 +16,10 @@ class Processor(ABC):
     
     @abstractmethod
     def run(self, *circuits : Circuit, **kwargs) -> Result:
+        pass
+
+    @abstractmethod
+    def pauli_type(self):
         pass
 
 class QiskitProcessor(Processor):
@@ -31,3 +36,6 @@ class QiskitProcessor(Processor):
     def run(self, circuit : QiskitCircuit, **kwargs) -> Result:
         counts = self._qpu.run(circuit, **kwargs).result().get_counts()
         return Result(counts)
+    
+    def pauli_type(self):
+        return QiskitPauli

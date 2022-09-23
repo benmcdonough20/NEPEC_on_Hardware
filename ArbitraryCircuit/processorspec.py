@@ -1,8 +1,8 @@
 from itertools import cycle, permutations, product
-from primitives.term import QiskitPauli
+import logging
+ 
+logger = logging.getLogger()
 
-#TODO: find a better solution for this
-pauli_type = QiskitPauli
 
 class ProcessorSpec:
     """Responsible for interacting with the processor interface to generate the Pauli bases
@@ -63,8 +63,10 @@ class ProcessorSpec:
             else:
                     raise Exception("Three or more predecessors encountered")
 
-        bases = ["".join(b) for b in bases]
-        return [pauli_type(string[::-1]) for string in bases]
+        bases = ["".join(b)[::-1] for b in bases]
+        logger.info("Created pauli bases")
+        logger.info(bases)
+        return [self._processor.pauli_type()(string) for string in bases]
 
     def _model_terms(self):
         n = self._n
@@ -81,7 +83,10 @@ class ProcessorSpec:
 
         model_terms.remove("".join(identity))
 
-        return [pauli_type(p) for p in model_terms]
+        logger.info("Created model with the following terms:")
+        logger.info(model_terms)
+
+        return [self._processor.pauli_type()(p) for p in model_terms]
 
     def transpile(self, qc, **kwargs):
         return self._processor.transpile(qc, inst_map = self.inst_map, **kwargs)

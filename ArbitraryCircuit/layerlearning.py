@@ -1,6 +1,9 @@
 from noisemodel import NoiseModel
 from benchmarkinstance import BenchmarkInstance
 from itertools import product
+import logging
+
+logger = logging.getLogger()
 
 class LayerLearning:
     def __init__(self, layer, samples, single_samples, depths):
@@ -39,5 +42,6 @@ class LayerLearning:
             inst.type = "single"
             instances.append(inst)
 
+        logger.info("Created experiment consisting of %u instances"%len(instances))
         self.instances = instances 
         return instances

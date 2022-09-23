@@ -33,18 +33,27 @@ class TermData:
         return self.term == self.pair
 
     def fit(self):
-        expfit = lambda x,a,b: a*np.exp(-b*x)
-        try:
-            (a,b),_ = curve_fit(expfit, self._depths(), self._list_expectations())
-        except:
-            (a,b) = 1,0
-
+        a,b = self._fit()
         self.spam = a
         self.fidelity = np.exp(-b)
+
+    def _fit(self):
+        expfit = lambda x,a,b: a*np.exp(-b*x)
+        try:
+            (a,b),_ = curve_fit(expfit, self._depths(), self._list_expectations(), p0 = [.8, .01])
+        except:
+            (a,b) = 1,0
+        return a,b
 
     def fit_single(self, meas_err):
         if any(self._single_vals):
             expectation = abs(sum(self._single_vals)/self._single_count)
             self.fidelity = min([1,expectation/meas_err])
+
+    def plot(self, ax):
+        xline = np.linspace(0,max(self._depths()), 100)
+        a,b = self._fit()
+        ax.plot(self._depths(), self._list_expectations(), 'x')
+        ax.plot(xline, [a*np.exp(-b*x) for x in xline])
 
     

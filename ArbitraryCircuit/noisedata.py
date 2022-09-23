@@ -54,3 +54,9 @@ class NoiseData:
         coeffs,_ = nnls(np.add(M1,M2), -np.log(fidelities))
         self.coeffs = coeffs
         #noise_model = NoiseModel([Term(p, prob=coeff) for p,coeff in zip(F1,coeffs)])
+
+    def plot(self, ax):
+        for term in self._term_data.keys():
+                termdata = self._term_data[term]
+                termdata.plot(ax)
+        return ax

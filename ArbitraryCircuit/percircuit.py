@@ -1,7 +1,4 @@
 from circuitlayer import CircuitLayer
-import contextvars
-
-imp = contextvars.ContextVar("implementation")
 
 class PERCircuit:
     """Aggregation of circuit layers. Responsable for generating circuit layers and
@@ -21,6 +18,11 @@ class PERCircuit:
             if inst.name() == "measure":
                 measurements.append_instruction(inst)
         return measurements
+
+    def add_noisemodel(self, noise_model):
+        for layer in self._layers:
+            if layer.cliff_layer == noise_model.cliff_layer:
+                layer.noisemodel = noise_model
 
     def _circuit_to_benchmark_layers(self):
         layers = []

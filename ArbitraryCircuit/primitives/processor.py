@@ -1,41 +1,40 @@
 from abc import ABC, abstractmethod
-from primitives.result import Result
-from qiskit.providers.backend import BackendV2
-from qiskit import transpile
 from primitives.circuit import Circuit, QiskitCircuit
-from primitives.term import QiskitPauli
+from primitives.pauli import QiskitPauli
 
 class Processor(ABC):
-    @abstractmethod
-    def sub_map(self, qubits):
-        pass
+    """A wrapper for interacting with a qpu backend. This object is responsible for
+    reporting the processor topology and transpiling circuits into the native gate set."""
 
     @abstractmethod
-    def transpile(self, circuit : Circuit, **kwargs):
-        pass
+    def sub_map(self, qubits : int):
+        """Return an undirected edge list in the form of tuples of ints representing connections
+        between qubits at those hardware addresses"""
+
+    @abstractmethod
+    def transpile(self, circuit : Circuit, inst_map, **kwargs):
+        """Transpile a circuit into the native gateset"""
     
-    @abstractmethod
-    def run(self, *circuits : Circuit, **kwargs) -> Result:
-        pass
-
+    @property
     @abstractmethod
     def pauli_type(self):
-        pass
+        """Returns the native Pauli type associated"""
+
+
+from qiskit import transpile
 
 class QiskitProcessor(Processor):
-    
-    def __init__(self, backend : BackendV2):
+    """Implementaton of a processor wrapper for the Qiskit API"""
+
+    def __init__(self, backend):
         self._qpu = backend
 
     def sub_map(self, inst_map):
         return self._qpu.coupling_map.graph.subgraph(inst_map)
 
-    def transpile(self, circuit : QiskitCircuit, inst_map = None, **kwargs):
+    def transpile(self, circuit : QiskitCircuit, inst_map, **kwargs):
         return QiskitCircuit(transpile(circuit.qc, self._qpu, inst_map = inst_map, **kwargs))
 
-    def run(self, circuit : QiskitCircuit, **kwargs) -> Result:
-        counts = self._qpu.run(circuit, **kwargs).result().get_counts()
-        return Result(counts)
-    
+    @property
     def pauli_type(self):
         return QiskitPauli

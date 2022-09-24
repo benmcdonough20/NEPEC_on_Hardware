@@ -1,7 +1,7 @@
 from itertools import cycle, permutations, product
 import logging
  
-logger = logging.getLogger()
+logger = logging.getLogger("experiment")
 
 
 class ProcessorSpec:
@@ -66,7 +66,7 @@ class ProcessorSpec:
         bases = ["".join(b)[::-1] for b in bases]
         logger.info("Created pauli bases")
         logger.info(bases)
-        return [self._processor.pauli_type()(string) for string in bases]
+        return [self._processor.pauli_type(string) for string in bases]
 
     def _model_terms(self):
         n = self._n
@@ -86,7 +86,7 @@ class ProcessorSpec:
         logger.info("Created model with the following terms:")
         logger.info(model_terms)
 
-        return [self._processor.pauli_type()(p) for p in model_terms]
+        return [self._processor.pauli_type(p) for p in model_terms]
 
-    def transpile(self, qc, **kwargs):
-        return self._processor.transpile(qc, inst_map = self.inst_map, **kwargs)
+    def transpile(self, circ, **kwargs):
+        return self._processor.transpile(circ, self.inst_map, **kwargs)

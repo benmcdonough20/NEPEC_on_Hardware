@@ -3,10 +3,11 @@ from random import random
 from scipy.optimize import nnls
 
 class NoiseModel:
-    def __init__(self, cliff_layer, model_terms):
+    def __init__(self, cliff_layer, model_terms, coefficients):
         self.cliff_layer = cliff_layer
+        self.coeffs = coefficients
         self.model_terms = model_terms
-        #self.overhead = np.exp(2*sum(noise_coefficients))
+        self.coeffs_dict = dict(zip(self.model_terms, self.coeffs))
     
     def scaled_noise(self, noise_parameter):
         pass 

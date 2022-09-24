@@ -1,5 +1,5 @@
 from primitives.circuit import Circuit
-from primitives.term import Pauli
+from primitives.pauli import Pauli
 
 from typing_extensions import Self
 from typing import Tuple
@@ -13,6 +13,7 @@ class CircuitLayer:
         self.layer = layer
         self.single_layer = self.separate_gates(1)
         self.cliff_layer =  self.separate_gates(2) 
+        self.noisemodel = None
 
     def separate_gates(self, weight : int) -> Circuit:
         """This method parses the list of gates in the input layer and returns a Circuit
@@ -40,3 +41,6 @@ class CircuitLayer:
     def sample_PER(self, noise_model) -> Tuple[Circuit, int, Pauli]:
         """sample a PER representation of the layer"""
         pass
+
+    def __str__(self):
+        return self.layer.__str__()

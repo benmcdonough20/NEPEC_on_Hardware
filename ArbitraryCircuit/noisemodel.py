@@ -5,11 +5,9 @@ from scipy.optimize import nnls
 class NoiseModel:
     def __init__(self, cliff_layer, model_terms, coefficients):
         self.cliff_layer = cliff_layer
-        self.coeffs = coefficients
-        self.model_terms = model_terms
-        self.coeffs_dict = dict(zip(self.model_terms, self.coeffs))
+        self.coeffs_dict = dict(zip(model_terms, coefficients))
     
-    def scaled_noise(self, noise_parameter):
+    def scaled_noise(self, noise_parameters):
         pass 
 
     def sample(self):
@@ -21,6 +19,3 @@ class NoiseModel:
                 operator = operator.compose(term)
                 sgn ^= 1
         return operator, sgn
-    
-    def issingle(self, p):
-        return p == p.conjugate(self.cliff_layer)

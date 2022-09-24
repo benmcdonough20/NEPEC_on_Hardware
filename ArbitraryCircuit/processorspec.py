@@ -88,5 +88,6 @@ class ProcessorSpec:
 
         return [self._processor.pauli_type(p) for p in model_terms]
 
+
     def transpile(self, circ, **kwargs):
         return self._processor.transpile(circ, self.inst_map, **kwargs)

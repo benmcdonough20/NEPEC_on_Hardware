@@ -41,26 +41,39 @@ class SparsePauliTomographyExperiment:
 
         self._procspec = ProcessorSpec(inst_map, backend_interface)
         self.instances = []
+        self.analysis = Analysis(self._procspec)
 
     def generate(self, samples, single_samples, depths):
+        """This method is used to generate the experimental benchmarking procedure. The samples
+        are the number of times to sample from the Pauli twirl. The single_samples controls
+        how many twirl samples to take from the degeneracy-lifting measurements. It may desirable
+        to make this higher since the error on these measurements will generally be higher.
+        The depths control the different circuit depths to use for the exponential fits."""
+
+        if len(depths) < 2:
+            raise Exception("Exponental fit required 3 or more depth data points.")
+
         self.instances = []
         for l in self._profiles:
             learning = LayerLearning(l, samples, single_samples, depths)
             self.instances += learning.procedure(self._procspec)
-        self.analysis = Analysis(self.instances, self._procspec)
 
     def run(self, executor):
+        """This method produces a list of circuits in the native representation, passes them 
+        as a list to the executor method, and associates the result with the benchmark instances
+        that produced it"""
+
         for l in self._profiles:
             circuits = [inst._circuit.original() for inst in self.instances]
 
         results = executor(circuits)
 
         for res,inst in zip(results, self.instances):
-            inst.result = res
+            inst.add_result(res)
 
     def analyze(self):
         """Runs analysis on each layer representative and stores for later plotting/viewing"""
-        self.analysis.analyze()
+        self.analysis.analyze(self.instances)
         noisemodels = self.analysis.noise_profiles()
 
     def save(self):

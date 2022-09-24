@@ -45,18 +45,16 @@ class TermData:
         #Record whether the expecatation value resulted from a single or double measurement
         self.type = PAIR
     
-    def add_single(self, expectation):
-        """Add the value of a single-depth measurement to the term data"""
+    def add_expectation(self, depth, expectation, type):
+        """Add the value of a measurement to the term data"""
+        if type == PAIR:
+            self._expectations[depth] = self._expectations.get(depth, 0) + expectation
+            self._count[depth] = self._count.get(depth, 0) + 1
+        elif type == SINGLE:
+            self.type = SINGLE #record that the fidelity is obtained through single measurements
+            self._single_vals.append(expectation) #record expectation value
+            self._single_count += 1
 
-        self.type = SINGLE #record that the fidelity is obtained through single measurements
-        self._single_vals.append(expectation) #record expectation value
-        self._single_count += 1
-        
-    def add_pair(self, depth, expectation):
-        """Add the value of a pair measurement to the term data"""
-
-        self._expectations[depth] = self._expectations.get(depth, 0) + expectation
-        self._count[depth] = self._count.get(depth, 0) + 1
 
     def depths(self):
         """Return the measurement depths as a list in increasing order"""
@@ -88,10 +86,11 @@ class TermData:
 
         #the pair measurements are more accurate, so the single-depth measurement is assumed
         #to be bounded by the fidelity that makes its pair 1
-        if fidelity > self.fidelity**2:
+        if self.fidelity**2 > fidelity:
             logger.warning("Single-depth measurement produced fidelity greater than one.")
-            self.fidelity = self.fidelity**2
-            return
+            logger.warning("Product fidelity: %d"%self.fidelity)
+            logger.warning("Single fidelity: %d"%fidelity)
+            fidelity = self.fidelity**2
 
         self.fidelity = fidelity
 

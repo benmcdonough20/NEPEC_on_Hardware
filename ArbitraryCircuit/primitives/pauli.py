@@ -11,10 +11,6 @@ class Pauli(ABC):
         """Initialize a Pauli using a string consisting of the characters IXYZ"""
 
     @abstractmethod
-    def weight(self) -> int:
-        """Return the number of qubits nontrivially affected by the Pauli operator"""
-
-    @abstractmethod
     def basis_change(self, qc) -> None:
         """This method appends to the circuit qc instructions to change from the computational
         basis to the eigenbasis of the Pauli operator"""
@@ -43,6 +39,9 @@ class Pauli(ABC):
 
     def self_conjugate(self, clifford): #returns True if self is an eigenoperator of clifford
         return self == clifford.conjugate(self)
+    
+    def weight(self):
+        return sum([p != "I" for p in self.to_label()])
 
     @classmethod
     def random(cls, n, subset = "IXYZ"): #generates a random Pauli operator
@@ -70,9 +69,6 @@ class QiskitPauli(Pauli):
     def __init__(self, name):
         self.pauli = self.Pauli(name)
 
-    def weight(self):
-        return len(self.pauli)
-
     def to_label(self):
         pauli_nophase = self.Pauli((self.pauli.z, self.pauli.x))
         return pauli_nophase.to_label()
@@ -88,9 +84,6 @@ class QiskitPauli(Pauli):
 
         return circ
     
-    def weight(self):
-        return len(self.pauli)
-
     def commutes(self,other):
         return self.pauli.commutes(other.pauli)
 

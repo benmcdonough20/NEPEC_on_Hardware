@@ -17,6 +17,7 @@ class CircuitLayer:
         self.single_layer = self.separate_gates(1)
         self.cliff_layer =  self.separate_gates(2) 
         self.noisemodel = None
+        self.pauli_type = self.cliff_layer.pauli_type
 
     def separate_gates(self, weight : int) -> Circuit:
         """This method parses the list of gates in the input layer and returns a Circuit
@@ -27,6 +28,21 @@ class CircuitLayer:
             if inst.weight() == weight:
                 qc.add_instruction(inst)
         return qc
+    
+    def sample(self, noise_strength, circ):
+        p_type = self.pauli_type
+
+        self.noisemodel.init_scaling(noise_strength) 
+        circ.compose(self.single_layer)
+        twirl = p_type.random(circ.num_qubits())
+        circ.add_pauli(twirl)
+        op, sgn = self.noisemodel.sample()
+        circ.add_pauli(op)
+        circ.compose(self.cliff_layer)
+        circ.barrier()
+        circ.add_pauli(self.cliff_layer.conjugate(twirl))
+
+        return sgn
 
     def __eq__(self, other : Self):
         """Two layers have the same noise profile if their clifford layers are equal. Thus,

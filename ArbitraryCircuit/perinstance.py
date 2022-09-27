@@ -27,26 +27,16 @@ class PERInstance(Instance):
         n = circ.num_qubits()
         p_type = self.pauli_type
         self.sgn_tot = 0
-        pauli_frame = p_type.ID(n)
         self.overhead = 1
+        
         for layer in self._percirc:
-            layer.noisemodel.init_scaling(self.noise_strength) 
-            self.overhead *= layer.noisemodel.overhead 
-            circ.compose(layer.single_layer)
-            twirl = p_type.random(n)
-            circ.add_pauli(twirl)
-            op, sgn = layer.noisemodel.sample()
+            sgn = layer.sample(self.noise_strength,circ)
             self.sgn_tot ^= sgn
-            circ.add_pauli(op)
-            twirl = layer.cliff_layer.conjugate(twirl)
-            pauli_frame *= twirl
-            circ.compose(layer.cliff_layer)
-            circ.barrier()
+            self.overhead *= layer.noisemodel.overhead 
 
-
-        circ.add_pauli(pauli_frame)
         self._basis_change()
         self._readout_twirl()
+        #self._rostring = self.pauli_type.random(n, subset = "IX").to_label()
         
         circ.measure_all()
         #self._circ = self._processor.transpile(self._circ, self._inst_map)

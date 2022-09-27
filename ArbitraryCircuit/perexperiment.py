@@ -2,7 +2,6 @@ from primitives.circuit import QiskitCircuit
 from percircuit import PERCircuit
 from perrun import PERRun
 from primitives.processor import QiskitProcessor
-from noisemodel import SCALING
 
 class PERExperiment:
     """This class plays the role of the SparsePauliTomographyExperiment class but for the

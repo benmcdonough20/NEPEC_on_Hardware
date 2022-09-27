@@ -55,15 +55,17 @@ class LayerNoiseData:
         for term in self._term_data.values(): #perform all pairwise fits
             term.fit()
         
-        logger.info("Fit noise model with following infidelities:") 
-        logger.info(["%s : %d"%(str(term.pauli),term.fidelity) for term in self._term_data.values()])
+        logger.info("Fit noise model with following fidelities:") 
+        logger.info([term.fidelity for term in self._term_data.values()])
+
         #get noise model from fits
-        self.fit_noisemodel()
+        self.nnls_fit()
 
     def _issingle(self, term):
         return term.pauli != term.pair and term.pair in self._term_data
-   
-    def fit_noisemodel(self):
+  
+    
+    def nnls_fit(self):
         """Generate a noise model corresponding to the Clifford layer being benchmarked
         for use in PER"""
 
@@ -115,10 +117,10 @@ class LayerNoiseData:
     def plot_coeffs(self, *qubits):
         """Plot the model coefficients in the generator of the sparse model corresponding
         to the current circuit layer"""
-
+        coeffs_dict = dict(self.noisemodel.coeffs)
         terms = self._model_terms(qubits)
         fig, ax = plt.subplots()
-        coeffs = [self.noisemodel.coeffs_dict[term] for term in terms]
+        coeffs = [coeffs_dict[term] for term in terms]
         ax.bar([term.to_label() for term in terms], coeffs)
 
     def graph(self, *qubits):

@@ -87,9 +87,9 @@ class TermData:
         #the pair measurements are more accurate, so the single-depth measurement is assumed
         #to be bounded by the fidelity that makes its pair 1
         if self.fidelity**2 > fidelity:
-            logger.warning("Single-depth measurement produced fidelity greater than one.")
-            logger.warning("Product fidelity: %d"%self.fidelity)
-            logger.warning("Single fidelity: %d"%fidelity)
+            logger.warning("Single-depth measurement produced fidelity greater than one: %s,%s"%(str(self.pauli), str(self.pair)))
+            logger.warning("Product fidelity: %s"%str(self.fidelity))
+            logger.warning("Single fidelity: %s"%str(fidelity))
             fidelity = self.fidelity**2
 
         self.fidelity = fidelity
@@ -115,5 +115,3 @@ class TermData:
         a,b = self._fit()
         ax.plot(self.depths(), self.expectations(), color = c, linestyle = 'None', marker = 'x')
         ax.plot(axis, [a*np.exp(-b*x) for x in axis], color = c)
-
-    

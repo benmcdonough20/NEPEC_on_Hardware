@@ -31,17 +31,35 @@ class Pauli(ABC):
     def __getitem__(self, item):
         """Used to iterate through the terms in the operator"""
 
+    @abstractmethod
+    def __setitem__(self, item):
+        """Used to manipulate operators term by term"""
+
     def simultaneous(self, other): #returns True if other can be measured simultaneously with self
         return all([p1==p2 or p2 == self.ID(1) for p1,p2 in zip(self, other)])
 
     def separate(self, other): #returns True if two Paulis have disjoin supports
-        return all([p1==p2 or p2 == self.ID(1) or p1 == self.ID(1) for p1,p2 in zip(self, other)])
+        return all([p2 == self.ID(1) or p1 == self.ID(1) for p1,p2 in zip(self, other)])
+
+    def nonoverlapping(self, other):
+        return all([p1==p2 or p1 == self.ID(1) or p2 == self.ID(1) for p1,p2 in zip(self, other)])
 
     def self_conjugate(self, clifford): #returns True if self is an eigenoperator of clifford
         return self == clifford.conjugate(self)
     
     def weight(self):
         return sum([p != "I" for p in self.to_label()])
+
+    def get_composite(self, other):
+        label1 = self.to_label()
+        label2 = other.to_label()
+        comp = ["I"]*max([len(label1),len(label2)])
+        for i, (l1,l2) in enumerate(zip(label1, label2)):
+            c = l1
+            if l1 == "I":
+                c = l2
+            comp[i] = c
+        return self.__class__("".join(comp))
 
     @classmethod
     def random(cls, n, subset = "IXYZ"): #generates a random Pauli operator
@@ -94,3 +112,6 @@ class QiskitPauli(Pauli):
 
     def __getitem__(self, item):
         return QiskitPauli(self.pauli.__getitem__(item))
+
+    def __setitem__(self, key, newvalue):
+        self.pauli.__setitem__(key, newvalue.pauli)

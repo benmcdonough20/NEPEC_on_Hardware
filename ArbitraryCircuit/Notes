@@ -1,0 +1,18 @@
+TODO:
+
+write a base class for benchmarkinstance to inherit from that implements readout twirling
+
+Write a PERExperiment class that centralizes data like the experiment class does
+    pass in a list of circuits and represent them as PERinstances
+    PERinstances inherit from the same class as benchmarkinstances
+    pass is a noisemodel and readoutmodel
+
+Classes to write
+- instance
+- PERExperiment
+- PERCircuitExperiment - like the layerlearning is to the experiment class
+- PERInstance
+- readoutmodel
+
+Relationships - 
+- initiate per experiment from sparsepaulitomographyframework

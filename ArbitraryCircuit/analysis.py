@@ -3,6 +3,8 @@ from matplotlib import pyplot as plt
 import pickle
 import logging
 
+from noisedataframe import NoiseDataFrame
+
 logger = logging.getLogger("experiment")
 
 class Analysis:
@@ -40,10 +42,19 @@ class Analysis:
             spam_coeffs = noisedata.get_spam_coeffs()
             for term in self.spam:
                 self.spam[term] += spam_coeffs[term]/len(self._data)
+
+        return self.noise_profiles()
             
     def noise_profiles(self):
         """Get the noise profiles used to run PER. This is the link from the analysis
         portion to the PER portion"""
+        noise_models = [noisedata.noisemodel for noisedata in self._data.values()]
+        noise_frame = NoiseDataFrame(noise_models, self.spam)
+        return noise_frame
+    
+    def layer_data(self):
+        """Returns a list of LayerNoiseData objects that can be used for plotting and
+        inspecting the full result of a run"""
 
         return list(self._data.values())
 

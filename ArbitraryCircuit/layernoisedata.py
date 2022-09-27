@@ -1,12 +1,13 @@
 from scipy.optimize import nnls
 from noisemodel import NoiseModel
-from termdata import TermData
+from termdata import TermData, COLORS
 import numpy as np
 from matplotlib import pyplot as plt
 from primitives.circuit import Circuit
 from primitives.pauli import Pauli
 from benchmarkinstance import BenchmarkInstance
 import logging
+from itertools import cycle
 
 logger = logging.getLogger("experiment")
 
@@ -98,15 +99,18 @@ class LayerNoiseData:
         coeffs,_ = nnls(np.add(M1,M2), -np.log(fidelities)) 
         self.noisemodel = NoiseModel(self.cliff_layer, F1, coeffs)
 
-    def _model_terms(self, qubits): #return a list of Pauli terms with the specified support
-        paulis = []
-        for pauli in self._term_data.keys():
-            overlap = [pauli[q].to_label() != "I" for q in qubits]
-            support = [p.to_label() == "I" or q in qubits for q,p in enumerate(pauli)]
-            if all(overlap) and all(support):
-                paulis.append(pauli)
+    def _model_terms(self, links): #return a list of Pauli terms with the specified support
+        groups = []
+        for link in links:
+            paulis = []
+            for pauli in self._term_data.keys():
+                overlap = [pauli[q].to_label() != "I" for q in link]
+                support = [p.to_label() == "I" or q in link for q,p in enumerate(pauli)]
+                if all(overlap) and all(support):
+                    paulis.append(pauli)
+            groups.append(paulis)
 
-        return paulis
+        return groups
 
     def get_spam_coeffs(self):
         """Return a dictionary of the spam coefficients of different model terms for use in 
@@ -114,36 +118,39 @@ class LayerNoiseData:
 
         return dict(zip(self._term_data.keys(), [termdata.spam for termdata in self._term_data.values()]))
 
-    def plot_coeffs(self, *qubits):
+    def plot_coeffs(self, *links):
         """Plot the model coefficients in the generator of the sparse model corresponding
         to the current circuit layer"""
-        coeffs_dict = dict(self.noisemodel.coeffs)
-        terms = self._model_terms(qubits)
-        fig, ax = plt.subplots()
-        coeffs = [coeffs_dict[term] for term in terms]
-        ax.bar([term.to_label() for term in terms], coeffs)
 
-    def graph(self, *qubits):
-        """Graph the fits values for a certain subset of Pauli terms"""
-        terms = self._model_terms(qubits)
+        coeffs_dict = dict(self.noisemodel.coeffs)
+        groups = self._model_terms(links)
         fig, ax = plt.subplots()
-        for term in terms:
-            termdata = self._term_data[term]
-            termdata.graph(ax)
+        colcy = cycle(COLORS)
+        for group in groups:
+            c = next(colcy)
+            coeffs = [coeffs_dict[term] for term in group]
+            ax.bar([term.to_label() for term in group], coeffs, color=c)
+
+    def graph(self, *links):
+        """Graph the fits values for a certain subset of Pauli terms"""
+
+        groups = self._model_terms(links)
+        fig, ax = plt.subplots()
+        for group in groups:
+            for term in group:
+                termdata = self._term_data[term]
+                termdata.graph(ax)
 
         return ax
 
-    def plot_infidelitites(self, *qubits):
+    def plot_infidelitites(self, *links):
         """Plot the infidelities of a subset of Pauli terms"""
 
-        terms = self._model_terms(qubits)
+        groups = self._model_terms(links)
         fig, ax = plt.subplots()
-        bars = []
-        names = []
-        for term in terms:
-            termdata = self._term_data[term]
-            names.append(term.to_label())
-            bars.append(1-termdata.fidelity)
-
-        ax.bar(names, bars)
+        colcy = cycle(COLORS)
+        for group in groups:
+            c = next(colcy)
+            infidelities = [1-self._term_data[term].fidelity for term in group]
+            ax.bar([term.to_label() for term in group], infidelities, color=c)
         return ax

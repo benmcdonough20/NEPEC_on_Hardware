@@ -18,9 +18,6 @@ class PERInstance(Instance):
         self.pauli_type = percirc._qc.pauli_type
         self._inst_map = inst_map
 
-        for layer in percirc:
-            layer.noisemodel.init_scaling(noise_strength)
-        
         super().__init__(percirc._qc, meas_basis)
 
     def _instance(self): #called automatically by super().__init__

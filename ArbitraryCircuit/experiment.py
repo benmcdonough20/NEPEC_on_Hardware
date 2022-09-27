@@ -2,6 +2,8 @@ from processorspec import ProcessorSpec
 from layerlearning import LayerLearning
 from analysis import Analysis
 from percircuit import PERCircuit
+from perexperiment import PERExperiment
+from typing import List, Any
 import logging
  
 logging.basicConfig(filename="experiment.log",
@@ -45,6 +47,7 @@ class SparsePauliTomographyExperiment:
         self._procspec = ProcessorSpec(inst_map, processor)
         self.instances = []
         self.analysis = Analysis(self._procspec)
+        self._inst_map = inst_map
 
     def generate(self, samples, single_samples, depths):
         """This method is used to generate the experimental benchmarking procedure. The samples
@@ -76,4 +79,15 @@ class SparsePauliTomographyExperiment:
 
     def analyze(self):
         """Runs analysis on each layer representative and stores for later plotting/viewing"""
-        return self.analysis.analyze(self.instances)
+        self.analysis.analyze(self.instances)
+        return self.analysis.noisedataframe
+
+    def create_per_experiment(self, circuits : Any) -> PERExperiment:
+        experiment = PERExperiment(circuits, self._inst_map, self.analysis.noisedataframe, backend = None, processor = self._procspec._processor)
+        return experiment
+
+    def save(self):
+        raise NotImplementedError()
+
+    def load(self):
+        raise NotImplementedError()

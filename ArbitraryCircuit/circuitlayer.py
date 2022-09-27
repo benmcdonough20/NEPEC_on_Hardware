@@ -10,6 +10,9 @@ class CircuitLayer:
     layers of this form. The layer input must be passed in with this form"""
 
     def __init__(self, layer : Circuit):
+        """input - Circuit
+        summary: parses circuit and stores single and clifford gates in separate circuits
+        """
         self.layer = layer
         self.single_layer = self.separate_gates(1)
         self.cliff_layer =  self.separate_gates(2) 

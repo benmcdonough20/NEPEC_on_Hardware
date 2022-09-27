@@ -1,8 +1,9 @@
 from perinstance import PERInstance
 from perdata import PERData
 
+
 class PERRun:
-    def __init__(self, processor, inst_map, per_circ, samples, noise_strengths, meas_bases, expectations, spam):
+    def __init__(self, processor, inst_map, per_circ, samples, noise_strengths, meas_bases, expectations):
         self._per_circ = per_circ
         self._pauli_type = per_circ._qc.pauli_type
         self._noise_strengths = noise_strengths
@@ -11,7 +12,6 @@ class PERRun:
         self._meas_bases = meas_bases
         self._expectations = expectations
         self._inst_map = inst_map
-        self.spam = spam
 
         self._generate()
 
@@ -34,10 +34,10 @@ class PERRun:
             if b != idn:
                 spam *= self.spam[b]
         return spam
-
          
     def analyze(self):
         self._data = {} #keys are expectations
+        self.spam = self._per_circ.spam
         sim_meas = {}
         for inst in self.instances:
 
@@ -54,3 +54,10 @@ class PERRun:
                     self._data[basis] = PERData(basis, spam)
 
                 self._data[basis].add_data(inst)
+
+        for perdat in self._data.values():
+            perdat.fit()
+
+    def get_result(self, label):
+        pauli = self._pauli_type(label)
+        return self._data[pauli]

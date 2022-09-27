@@ -1,20 +1,35 @@
 import numpy as np
 from random import random
 
-NO_NOISE = 0
+SCALING = "scaling"
+LOCAL_DEPOL = "ldepol"
+CROSSTALK_SCALING = "ctscale"
+
 
 class NoiseModel:
+    """ Stores noise parameters, computes probabilities and overhead to perform noise scaling and
+    tuning, provides a sampling method to automatically sample from the partial noise inverse
+    """
+
     def __init__(self, cliff_layer, model_terms, coefficients):
+        """Initalizes a noise model with the associate clifford layer, model terms, and the
+        coefficients learned from tomography.
+
+        Args:
+            cliff_layer (_type_): _description_
+            model_terms (_type_): _description_
+            coefficients (_type_): _description_
+        """
+
         self.cliff_layer = cliff_layer
         self.coeffs = list(zip(model_terms, coefficients))
         self.pauli_type = cliff_layer.pauli_type
-        self.init_scaling(NO_NOISE)
 
     def init_scaling(self, strength):
         new_coeffs = [(term, strength*coeff) for term,coeff in self.coeffs]
-        self.init_tuning(new_coeffs)
+        self._init_tuning(new_coeffs)
 
-    def init_tuning(self, noise_params):
+    def _init_tuning(self, noise_params):
         new_coeffs =  dict(noise_params)
         new_probs = []
         for pauli, lambdak in self.coeffs:
@@ -49,8 +64,3 @@ class NoiseModel:
 
     def coeffs(self):
         return list(zip(*self.coeffs))[1]
-    
-    def overhead(self, strength):
-        if strength >= 1:
-            return np.exp(2*(1-strength)*sum(self.coeffs))
-            

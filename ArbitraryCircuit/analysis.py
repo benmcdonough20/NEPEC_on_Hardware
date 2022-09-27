@@ -1,4 +1,4 @@
-from noisedata import LayerNoiseData
+from layernoisedata import LayerNoiseData
 from matplotlib import pyplot as plt
 import pickle
 import logging
@@ -49,8 +49,8 @@ class Analysis:
         """Get the noise profiles used to run PER. This is the link from the analysis
         portion to the PER portion"""
         noise_models = [noisedata.noisemodel for noisedata in self._data.values()]
-        noise_frame = NoiseDataFrame(noise_models, self.spam)
-        return noise_frame
+        self.noisedataframe = NoiseDataFrame(noise_models, self.spam)
+        return self.noisedataframe
     
     def layer_data(self):
         """Returns a list of LayerNoiseData objects that can be used for plotting and
@@ -59,13 +59,7 @@ class Analysis:
         return list(self._data.values())
 
     def save(self):
-        """Save the result of analysis"""
+        raise NotImplementedError()
 
-        with open("results.dat", "wb") as f:
-            pickle.dump(self,f)
-     
     def load(self):
-        with open("results.dat", "rb") as f:
-            analysis = pickle.load(f)
-            self._data = analysis._data
-            self.spam = analysis._spam
+        raise NotImplementedError()

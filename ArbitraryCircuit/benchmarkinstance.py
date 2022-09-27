@@ -35,7 +35,8 @@ class BenchmarkInstance(Instance):
 
         super().__init__(cliff_layer, meas_basis)
 
-    def _instance(self):
+    def _instance(self): #called by super().__init__
+
             #Generates a circuit for benchmarking. Takes as input the processor specification
             #in case piecewise transpilation is necessary.
             self._circ = self.cliff_layer.copy_empty() #storing the final circuit

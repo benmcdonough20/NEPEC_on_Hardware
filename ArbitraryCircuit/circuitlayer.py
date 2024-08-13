@@ -30,16 +30,24 @@ class CircuitLayer:
         return qc
     
     def sample(self, noise_strength, circ):
+        """Sample from the noise-scaled representation of this circuit layer, including pauli
+        twirling"""
+
         p_type = self.pauli_type
 
-        self.noisemodel.init_scaling(noise_strength) 
-        circ.compose(self.single_layer)
-        twirl = p_type.random(circ.num_qubits())
+        self.noisemodel.init_scaling(noise_strength) #set up coefficients for sampling
+        circ.compose(self.single_layer) #compose single-qubit layer
+
+        twirl = p_type.random(circ.num_qubits()) #generate a random pauli
         circ.add_pauli(twirl)
-        op, sgn = self.noisemodel.sample()
-        circ.add_pauli(op)
+
+        op, sgn = self.noisemodel.sample() #sample from noise and record sign
+        circ.add_pauli(op) 
+
         circ.compose(self.cliff_layer)
         circ.barrier()
+
+        #invert pauil twirl and compose into next layer for consistent noise
         circ.add_pauli(self.cliff_layer.conjugate(twirl))
 
         return sgn
